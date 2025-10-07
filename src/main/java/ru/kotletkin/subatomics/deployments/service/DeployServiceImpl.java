@@ -1,5 +1,10 @@
 package ru.kotletkin.subatomics.deployments.service;
 
+import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.fabric8.kubernetes.client.utils.Serialization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +40,7 @@ public class DeployServiceImpl {
                 .collect(Collectors.toMap(Registration::getName, Function.identity()));
 
         // todo: add exception processing
-        if (modulesNames.size() != registrations.size()) {
+        if (modulesNames.stream().distinct().toList().size() != registrations.size()) {
             throw new RuntimeException("Modules names and registrations do not match");
         }
 
@@ -52,8 +57,62 @@ public class DeployServiceImpl {
             }
 
         }
-        log.info(deployRequest.toString());
 
+        for (DeployModuleDTO module : modulesInRequest) {
+
+            String name = "deployment-" + module.getName() + "-" + System.currentTimeMillis();
+
+            Deployment deployment = new DeploymentBuilder()
+                    .withNewMetadata()
+                    .withName(name)
+                    .withNamespace(deployRequest.getNamespace())
+                    .withLabels(Map.of("app", name))
+                    .endMetadata()
+                    .withNewSpec()
+                    .withReplicas(1)
+                    .withNewSelector()
+                    .withMatchLabels(Map.of("app", name))
+                    .endSelector()
+                    .withNewTemplate()
+                    .withNewMetadata()
+                    .withLabels(Map.of("app", name))
+                    .endMetadata()
+                    .withNewSpec()
+                    .addNewContainer()
+                    .withName("app")
+                    .withImage(registrations.get(module.getName()).getImage())
+                    .withEnv(
+                            new EnvVarBuilder()
+                                    .withName("SPRING_PROFILES_ACTIVE")
+                                    .withValue("production")
+                                    .build(),
+                            new EnvVarBuilder()
+                                    .withName("DB_URL")
+                                    .withValue("jdbc:postgresql://db-host:5432/mydb")
+                                    .build(),
+                            new EnvVarBuilder()
+                                    .withName("APP_VERSION")
+                                    .withValue("1.0.0")
+                                    .build()
+                    )
+                    .withNewResources()
+                    .addToLimits(Map.of(
+                            "cpu", new Quantity("500m"),
+                            "memory", new Quantity("512Mi")
+                    ))
+                    .addToRequests(Map.of(
+                            "cpu", new Quantity("250m"),
+                            "memory", new Quantity("256Mi")
+                    ))
+                    .endResources()
+                    .endContainer()
+                    .endSpec()
+                    .endTemplate()
+                    .endSpec()
+                    .build();
+
+            log.info(Serialization.asYaml(deployment));
+        }
 
 
     }
