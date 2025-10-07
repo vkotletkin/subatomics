@@ -1,0 +1,9 @@
+deployments:
+  parameters:
+    defaults:
+      limits:
+        cpu: "512m"
+        memory: "1024Mi"
+      probes:
+        liveness: "/infra/health"
+        readiness: "/infra/rediness"

@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+
+  config:
+    import:
+      - optional:file:deployments.yaml
+      - classpath:deployments.yaml
+
+  application:
+    name: ${APPLICATION_NAME:smetannik}
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:postgres}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+
+  sql:
+    init:
+      mode: never
+
+springdoc:
+  show-actuator: true
+
+management:
+  endpoints:
+    web:
+      base-path: "/infra"
+      exposure:
+        include: health, info, metrics, prometheus
+        exclude: env
+  prometheus:
+    metrics:
+      export:
+        enabled: true
