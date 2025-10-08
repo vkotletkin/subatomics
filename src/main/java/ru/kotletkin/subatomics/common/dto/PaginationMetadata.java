@@ -11,5 +11,5 @@ import lombok.experimental.FieldDefaults;
 public class PaginationMetadata {
     int offset;
     int limit;
-    int count;
+    long count;
 }

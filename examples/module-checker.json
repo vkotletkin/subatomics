@@ -1,0 +1,12 @@
+{
+  "name": "module-checker",
+  "version": "2.0",
+  "image": "vkotletkin.docker.registry.io/module/checker:2.0",
+  "author": "Jora Sturmer",
+  "gitlabLink": "http://gitlab.io/checker.git",
+  "environmentVariables": {
+    "RABBITMQ_HOST": "amqp://test",
+    "RABBITMQ_USER": "rabbitmq",
+    "RABBITMQ_PSWD": "rabbitmq"
+  }
+}

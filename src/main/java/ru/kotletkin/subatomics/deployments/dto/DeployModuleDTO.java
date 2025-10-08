@@ -14,7 +14,7 @@ import java.util.Map;
 public class DeployModuleDTO {
 
     @NotBlank
-    String name;
+    Long id;
 
     @NotNull
     Map<String, String> environments;

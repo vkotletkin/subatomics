@@ -36,7 +36,7 @@ public class RegistartionServiceImpl implements RegistrationService {
         PaginationMetadata paginationMetadata = PaginationMetadata.builder()
                 .offset(offset)
                 .limit(limit)
-                .count(registrations.getSize())
+                .count(registrations.getTotalElements())
                 .build();
 
         return RegistrationPage.builder()

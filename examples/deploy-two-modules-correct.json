@@ -1,0 +1,23 @@
+{
+  "deployName": "my-test-deploy",
+  "namespace": "processing-data",
+  "requesterName": "V. Kotletkin",
+  "modules": [
+    {
+      "id": 1,
+      "environments": {
+        "POSTGRES_HOST": "jdbc://test",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PSWD": "postgres"
+      }
+    },
+    {
+      "id": 3,
+      "environments": {
+        "RABBITMQ_HOST": "amqp://test",
+        "RABBITMQ_USER": "rabbitmq",
+        "RABBITMQ_PSWD": "rabbitmq"
+      }
+    }
+  ]
+}

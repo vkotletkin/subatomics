@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
 
-    List<Registration> findByNameIn(List<String> names);
+    List<Registration> findByIdIn(List<Long> ids);
 }

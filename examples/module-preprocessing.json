@@ -1,0 +1,12 @@
+{
+  "name": "module-preprocessing",
+  "version": "1.0",
+  "image": "vkotletkin.docker.registry.io/module/preprocessing:1.0",
+  "author": "Vladislav Kotletkin",
+  "gitlabLink": "http://gitlab.io/module.git",
+  "environmentVariables": {
+    "POSTGRES_HOST": "jdbc://test",
+    "POSTGRES_USER": "postgres",
+    "POSTGRES_PSWD": "postgres"
+  }
+}
