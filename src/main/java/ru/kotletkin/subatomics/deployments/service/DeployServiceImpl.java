@@ -14,10 +14,14 @@ import ru.kotletkin.subatomics.common.exception.IncorrectModulesException;
 import ru.kotletkin.subatomics.deployments.dto.DeployModuleDTO;
 import ru.kotletkin.subatomics.deployments.dto.DeployParametersDTO;
 import ru.kotletkin.subatomics.deployments.dto.DeployRequest;
+import ru.kotletkin.subatomics.deployments.model.DeploymentPlane;
+import ru.kotletkin.subatomics.deployments.repository.DeploymentPlaneRepository;
 import ru.kotletkin.subatomics.registration.Registration;
 import ru.kotletkin.subatomics.registration.RegistrationRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -30,10 +34,13 @@ public class DeployServiceImpl {
 
     private final RegistrationRepository registrationRepository;
     private final DeploymentsConfig deploymentsConfig;
+    private final DeploymentPlaneRepository deploymentPlaneRepository;
 
     public void handleRequest(DeployRequest deployRequest) {
 
         // add deployName exists or not
+        if (deploymentPlaneRepository.findByNamespace(deployRequest.getNamespace()).size() != 0) {
+        }
         // add check namespace with modules or not
 
         // check query validate
@@ -51,10 +58,9 @@ public class DeployServiceImpl {
         // check all modules are really exists in registrations and environments equals
         checkModulesConsistency(modulesInRequest, registrations);
 
-        for (String a : generateYaml(modulesInRequest, deployRequest, registrations)) {
-            log.info(a);
-        }
+        DeploymentPlane deploymentPlane = generatePlane(modulesInRequest, deployRequest, registrations);
 
+        deploymentPlaneRepository.save(deploymentPlane);
     }
 
     private void validateRequest(DeployRequest request) {
@@ -100,10 +106,10 @@ public class DeployServiceImpl {
         }
     }
 
-    private List<String> generateYaml(List<DeployModuleDTO> modulesInRequest, DeployRequest deployRequest,
-                                      Map<Long, Registration> registrations) {
+    private DeploymentPlane generatePlane(List<DeployModuleDTO> modulesInRequest, DeployRequest deployRequest,
+                                          Map<Long, Registration> registrations) {
 
-        List<String> deploymentsInYaml = new ArrayList<>();
+        Map<String, String> modulesManifestsMap = new HashMap<>();
 
         for (DeployModuleDTO module : modulesInRequest) {
 
@@ -150,8 +156,16 @@ public class DeployServiceImpl {
                     .endSpec()
                     .build();
 
-            deploymentsInYaml.add(Serialization.asYaml(deployment));
+            modulesManifestsMap.put(name, Serialization.asYaml(deployment));
+
         }
-        return deploymentsInYaml;
+        return DeploymentPlane.builder()
+                .name(deployRequest.getDeployName())
+                .namespace(deployRequest.getNamespace())
+                .requesterName(deployRequest.getRequesterName())
+                .modulesManifestMap(modulesManifestsMap)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
     }
 }

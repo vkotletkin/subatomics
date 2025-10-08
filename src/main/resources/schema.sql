@@ -1,5 +1,5 @@
 -- Microservices registrations
-CREATE TABLE IF NOT EXISTS microservices
+CREATE TABLE IF NOT EXISTS registration_services
 (
     id          BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
     name        TEXT                                NOT NULL,
@@ -9,17 +9,38 @@ CREATE TABLE IF NOT EXISTS microservices
     author      TEXT                                NOT NULL,
     created_at  TIMESTAMP                           NOT NULL,
     updated_at  TIMESTAMP                           NOT NULL,
-    CONSTRAINT uk_microservice_name_version UNIQUE (name, version)
+    CONSTRAINT uk_registration_name_version UNIQUE (name, version)
 );
 
-CREATE TABLE IF NOT EXISTS microservice_environment_variables
+CREATE TABLE IF NOT EXISTS registration_services_environments
 (
-    microservice_id BIGINT NOT NULL,
+    registration_id BIGINT NOT NULL,
     variable_key    TEXT   NOT NULL,
     variable_value  TEXT   NOT NULL,
-    PRIMARY KEY (microservice_id, variable_key),
-    FOREIGN KEY (microservice_id) REFERENCES microservices (id) ON DELETE CASCADE
+    PRIMARY KEY (registration_id, variable_key),
+    FOREIGN KEY (registration_id) REFERENCES registration_services (id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_microservices_created_at ON microservices (created_at);
-CREATE INDEX IF NOT EXISTS idx_env_vars_microservice_id ON microservice_environment_variables (microservice_id);
+CREATE INDEX IF NOT EXISTS idx_registrations_created_at ON registration_services (created_at);
+CREATE INDEX IF NOT EXISTS idx_env_vars_registration_id ON registration_services_environments (registration_id);
+
+CREATE TABLE IF NOT EXISTS deployment_planes
+(
+    id             BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
+    name           TEXT                                NOT NULL,
+    namespace      TEXT                                NOT NULL,
+    requester_name TEXT                                NOT NULL,
+    created_at     TIMESTAMP                           NOT NULL,
+    updated_at     TIMESTAMP                           NOT NULL,
+    CONSTRAINT uk_deployments_name_version UNIQUE (name, namespace)
+);
+
+CREATE TABLE IF NOT EXISTS deployment_manifests
+(
+    deployment_plane_id BIGINT NOT NULL,
+    module_name         TEXT   NOT NULL,
+    module_manifest     TEXT   NOT NULL,
+    PRIMARY KEY (deployment_plane_id, module_name),
+    FOREIGN KEY (deployment_plane_id) REFERENCES deployment_planes (id) ON DELETE CASCADE
+)
+
