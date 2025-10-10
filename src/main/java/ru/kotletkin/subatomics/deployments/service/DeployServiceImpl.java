@@ -8,18 +8,20 @@ import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.gitlab4j.api.GitLabApi;
+import org.gitlab4j.api.GitLabApiException;
+import org.gitlab4j.api.models.CommitAction;
+import org.gitlab4j.api.models.RepositoryFile;
+import org.gitlab4j.models.Constants;
 import org.springframework.stereotype.Service;
 import ru.kotletkin.subatomics.common.config.DeploymentsConfig;
 import ru.kotletkin.subatomics.common.exception.IncorrectModulesException;
 import ru.kotletkin.subatomics.deployments.dto.DeployModuleDTO;
 import ru.kotletkin.subatomics.deployments.dto.DeployParametersDTO;
 import ru.kotletkin.subatomics.deployments.dto.DeployRequest;
-import ru.kotletkin.subatomics.deployments.model.DeploymentPlane;
-import ru.kotletkin.subatomics.deployments.repository.DeploymentPlaneRepository;
 import ru.kotletkin.subatomics.registration.Registration;
 import ru.kotletkin.subatomics.registration.RegistrationRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,13 +36,15 @@ public class DeployServiceImpl {
 
     private final RegistrationRepository registrationRepository;
     private final DeploymentsConfig deploymentsConfig;
-    private final DeploymentPlaneRepository deploymentPlaneRepository;
+    private final GitlabProjectServiceImpl gitlabProjectService;
+
+    private final GitLabApi gitLabApi;
 
     public void handleRequest(DeployRequest deployRequest) {
 
         // add deployName exists or not
-        if (deploymentPlaneRepository.findByNamespace(deployRequest.getNamespace()).size() != 0) {
-        }
+//        if (deploymentPlaneRepository.findByNamespace(deployRequest.getNamespace()).size() != 0) {
+//        }
         // add check namespace with modules or not
 
         // check query validate
@@ -58,9 +62,34 @@ public class DeployServiceImpl {
         // check all modules are really exists in registrations and environments equals
         checkModulesConsistency(modulesInRequest, registrations);
 
-        DeploymentPlane deploymentPlane = generatePlane(modulesInRequest, deployRequest, registrations);
+        Map<String, String> deployments = generatePlane(modulesInRequest, deployRequest, registrations);
 
-        deploymentPlaneRepository.save(deploymentPlane);
+
+//        deploymentPlaneRepository.save(deploymentPlane);
+
+        try {
+            CommitAction dirAction = new CommitAction();
+            dirAction.setAction(CommitAction.Action.CREATE);
+
+            dirAction.setFilePath(deployRequest.getDeployName() + "/.gitkeep");
+            dirAction.setContent("");  // Пустой файл для создания директории
+            dirAction.setEncoding(Constants.Encoding.TEXT);
+            gitLabApi.getCommitsApi().createCommit(2L, "main", "Create by " + deployRequest.getRequesterName(), null, "test", deployRequest.getRequesterName(), dirAction);
+            System.out.println("Directory created: " + deployRequest.getDeployName());
+            for (Map.Entry<String, String> entry : deployments.entrySet()) {
+                String filepath = deployRequest.getDeployName() + "/" + entry.getKey() + ".yaml";
+                log.info("Create deploy file : {}", filepath);
+                RepositoryFile repositoryFile = new RepositoryFile();
+                repositoryFile.setFilePath(filepath);
+                repositoryFile.setContent(entry.getValue());
+
+                gitLabApi.getRepositoryFileApi().createFile(2L, repositoryFile, "main", "test");
+            }
+        } catch (GitLabApiException e) {
+            e.printStackTrace();
+            e.getMessage();
+
+        }
     }
 
     private void validateRequest(DeployRequest request) {
@@ -106,8 +135,8 @@ public class DeployServiceImpl {
         }
     }
 
-    private DeploymentPlane generatePlane(List<DeployModuleDTO> modulesInRequest, DeployRequest deployRequest,
-                                          Map<Long, Registration> registrations) {
+    private Map<String, String> generatePlane(List<DeployModuleDTO> modulesInRequest, DeployRequest deployRequest,
+                                              Map<Long, Registration> registrations) {
 
         Map<String, String> modulesManifestsMap = new HashMap<>();
 
@@ -159,13 +188,6 @@ public class DeployServiceImpl {
             modulesManifestsMap.put(name, Serialization.asYaml(deployment));
 
         }
-        return DeploymentPlane.builder()
-                .name(deployRequest.getDeployName())
-                .namespace(deployRequest.getNamespace())
-                .requesterName(deployRequest.getRequesterName())
-                .modulesManifestMap(modulesManifestsMap)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        return modulesManifestsMap;
     }
 }

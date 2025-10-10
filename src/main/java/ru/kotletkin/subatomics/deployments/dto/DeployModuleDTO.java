@@ -1,6 +1,5 @@
 package ru.kotletkin.subatomics.deployments.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -15,6 +14,9 @@ public class DeployModuleDTO {
 
     @NotBlank
     Long id;
+
+    @NotBlank
+    String name;
 
     @NotNull
     Map<String, String> environments;
