@@ -1,4 +1,4 @@
-package ru.kotletkin.subatomics.registration;
+package ru.kotletkin.subatomics.registration.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

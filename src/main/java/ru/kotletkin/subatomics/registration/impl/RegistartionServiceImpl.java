@@ -1,4 +1,4 @@
-package ru.kotletkin.subatomics.registration;
+package ru.kotletkin.subatomics.registration.impl;
 
 
 import lombok.RequiredArgsConstructor;
@@ -9,10 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kotletkin.subatomics.common.dto.BaseResponse;
 import ru.kotletkin.subatomics.common.dto.PaginationMetadata;
+import ru.kotletkin.subatomics.registration.RegistrationMapper;
+import ru.kotletkin.subatomics.registration.RegistrationRepository;
+import ru.kotletkin.subatomics.registration.RegistrationService;
 import ru.kotletkin.subatomics.registration.dto.RegistrationDTO;
 import ru.kotletkin.subatomics.registration.dto.RegistrationPage;
 import ru.kotletkin.subatomics.registration.dto.RegistrationRequest;
 import ru.kotletkin.subatomics.registration.dto.RegistrationSort;
+import ru.kotletkin.subatomics.registration.model.Registration;
 
 import static ru.kotletkin.subatomics.common.exception.NotFoundException.notFoundException;
 

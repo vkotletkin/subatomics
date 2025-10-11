@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.kotletkin.subatomics.deployments.dto.DeployRequest;
-import ru.kotletkin.subatomics.deployments.service.DeployServiceImpl;
+import ru.kotletkin.subatomics.deployments.service.DeploymentServiceImpl;
 
 @Validated
 @RestController
@@ -16,7 +16,7 @@ import ru.kotletkin.subatomics.deployments.service.DeployServiceImpl;
 @RequiredArgsConstructor
 public class DeploymentController {
 
-    private final DeployServiceImpl deployService;
+    private final DeploymentServiceImpl deployService;
 
     @PostMapping
     public void deploySchema(@Valid @RequestBody DeployRequest deployRequest) {

@@ -2,14 +2,15 @@ package ru.kotletkin.subatomics.deployments.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.gitlab4j.api.Constants;
 import org.gitlab4j.api.GitLabApi;
 import org.gitlab4j.api.GitLabApiException;
-import org.gitlab4j.api.models.Project;
-import org.gitlab4j.api.models.RepositoryFile;
+import org.gitlab4j.api.models.CommitAction;
+import org.gitlab4j.models.Constants;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -18,41 +19,30 @@ public class GitlabProjectServiceImpl {
 
     private final GitLabApi gitLabApi;
 
-    public Long getProjectId(String projectPath) throws GitLabApiException {
-        Project project = gitLabApi.getProjectApi().getProject(projectPath);
-        log.info("Project ID for '{}': {}", projectPath, project.getId());
-        return project.getId();
-    }
+    public void createDeploy(String deployName, String author, Map<String, String> deployments) throws GitLabApiException {
 
-    // Получить все проекты пользователя
-    public List<Project> getUserProjects() throws GitLabApiException {
-        return gitLabApi.getProjectApi().getProjects();
-    }
+        List<CommitAction> commitActions = new ArrayList<>();
 
-    // Найти проект по имени
-    public Project findProjectByName(String projectName) throws GitLabApiException {
-        List<Project> projects = gitLabApi.getProjectApi().getProjects(projectName);
-        if (!projects.isEmpty()) {
-            return projects.getFirst();
+        CommitAction dirAction = new CommitAction();
+        dirAction.setAction(CommitAction.Action.CREATE);
+        dirAction.setFilePath(deployName + "/.gitkeep");
+        dirAction.setContent("");  // Пустой файл для создания директории
+        dirAction.setEncoding(Constants.Encoding.TEXT);
+
+        commitActions.add(dirAction);
+
+        for (Map.Entry<String, String> entry : deployments.entrySet()) {
+            CommitAction entryDirAction = new CommitAction();
+            entryDirAction.setAction(CommitAction.Action.CREATE);
+            entryDirAction.setFilePath(deployName + "/" + entry.getKey());
+            entryDirAction.setContent(entry.getValue());  // Пустой файл для создания директории
+            entryDirAction.setEncoding(Constants.Encoding.TEXT);
+            commitActions.add(entryDirAction);
         }
-        throw new RuntimeException("Project not found: " + projectName);
-    }
 
-    // Альтернативный вариант с явными параметрами
-    public void createFileExplicit(Long projectId, String filePath, String content,
-                                   String branch, String commitMessage) throws GitLabApiException {
-
-        RepositoryFile file = new RepositoryFile();
-        file.setFilePath(filePath);
-        file.setContent(content);
-        file.setEncoding(Constants.Encoding.TEXT);
-
-
-        gitLabApi.getRepositoryFileApi().createFile(projectId, file, branch, commitMessage);
-//
-//        CommitAction ca = new CommitAction().
-//
-//        gitLabApi.getCommitsApi().createCommit()
+        gitLabApi.getCommitsApi().createCommit(2L, "main", "Create by " + author, null,
+                "Deployer Service", author, commitActions);
 
     }
+
 }

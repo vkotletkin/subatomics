@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.kotletkin.subatomics.registration.dto.RegistrationDTO;
 import ru.kotletkin.subatomics.registration.dto.RegistrationRequest;
+import ru.kotletkin.subatomics.registration.model.Registration;
 
 import java.time.LocalDateTime;
 import java.util.List;
