@@ -19,6 +19,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DeploymentPlaneManifestGenerator {
 
+    private static final String NAME_PATTERN = "deployment-%d-%s-%d"; // DEPLOYMENT-IDENTIFICATOR-NAME-TIME
+
     private final DeploymentsConfig deploymentsConfig;
 
     public Map<String, String> generatePlane(List<DeployModuleDTO> modulesInRequest, DeployRequest deployRequest,
@@ -39,10 +41,11 @@ public class DeploymentPlaneManifestGenerator {
     }
 
     private String createDeploymentName(DeployModuleDTO module) {
-        return String.format("deployment-%d-%s-%d",
+        long label = System.currentTimeMillis();
+        return String.format(NAME_PATTERN,
                 module.getId(),
                 module.getName(),
-                System.currentTimeMillis());
+                label);
     }
 
     private Deployment buildDeployment(DeployModuleDTO module, String namespace,

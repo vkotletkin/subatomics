@@ -23,24 +23,3 @@ CREATE TABLE IF NOT EXISTS registration_services_environments
 
 CREATE INDEX IF NOT EXISTS idx_registrations_created_at ON registration_services (created_at);
 CREATE INDEX IF NOT EXISTS idx_env_vars_registration_id ON registration_services_environments (registration_id);
-
-CREATE TABLE IF NOT EXISTS deployment_planes
-(
-    id             BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
-    name           TEXT                                NOT NULL,
-    namespace      TEXT                                NOT NULL,
-    requester_name TEXT                                NOT NULL,
-    created_at     TIMESTAMP                           NOT NULL,
-    updated_at     TIMESTAMP                           NOT NULL,
-    CONSTRAINT uk_deployments_name_version UNIQUE (name, namespace)
-);
-
-CREATE TABLE IF NOT EXISTS deployment_manifests
-(
-    deployment_plane_id BIGINT NOT NULL,
-    module_name         TEXT   NOT NULL,
-    module_manifest     TEXT   NOT NULL,
-    PRIMARY KEY (deployment_plane_id, module_name),
-    FOREIGN KEY (deployment_plane_id) REFERENCES deployment_planes (id) ON DELETE CASCADE
-)
-

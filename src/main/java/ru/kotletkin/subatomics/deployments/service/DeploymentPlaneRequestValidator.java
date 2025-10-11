@@ -27,13 +27,6 @@ public class DeploymentPlaneRequestValidator {
         this.checkParameters(request);
     }
 
-    public void validateSize(Map<Long, Registration> registrations, List<Long> moduleNames) {
-
-        if (registrations.size() != moduleNames.size()) {
-            throw new IncorrectModulesException("Modules names and registrations do not match");
-        }
-    }
-
     public void validateModulesConsistency(List<DeployModuleDTO> requestedModules,
                                            Map<Long, Registration> registrations) {
 
@@ -41,6 +34,7 @@ public class DeploymentPlaneRequestValidator {
     }
 
     public void validateModuleConsistency(DeployModuleDTO module, Map<Long, Registration> registrations) {
+
         Long moduleId = module.getId();
         Registration registration = registrations.get(moduleId);
 

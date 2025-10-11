@@ -60,6 +60,7 @@ public class RegistartionServiceImpl implements RegistrationService {
     @Override
     @Transactional
     public BaseResponse registerMicroservice(RegistrationRequest registrationDTO) {
+        // todo: add check on name, version
         Registration registration = registrationMapper.toModel(registrationDTO);
         registrationRepository.save(registration);
         return new BaseResponse("Заявка на регистрацию успешно отправлена", "Описание отсутствует");
