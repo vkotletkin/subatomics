@@ -44,4 +44,4 @@ management:
 
 gitlab:
   url: http://gitlab.local:80
-  token: glpat-4E1CwB6TXYsZwZYoDpxj
+  token:
