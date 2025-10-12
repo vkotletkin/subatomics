@@ -1,7 +1,7 @@
 {
   "name": "module-checker",
-  "version": "2.0",
-  "image": "vkotletkin.docker.registry.io/module/checker:2.0",
+  "version": "1.0",
+  "image": "gcr.io/google-samples/gb-frontend:v5",
   "author": "Jora Sturmer",
   "gitlabLink": "http://gitlab.io/checker.git",
   "environmentVariables": {

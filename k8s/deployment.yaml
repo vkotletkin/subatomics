@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subatomics-spring-app
+  namespace: default
+  labels:
+    app: subatomics
+    version: "0.0.1-SNAPSHOT"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: subatomics
+  template:
+    metadata:
+      labels:
+        app: subatomics
+        version: "0.0.1-SNAPSHOT"
+      annotations:
+        signoz.io/logs: "true"
+    spec:
+      containers:
+        - name: subatomics-app
+          image: nkhzrd/subatomics:0.0.1-SNAPSHOT
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: DB_HOST
+              value: "192.168.207.128"
+            # ===== Kubernetes Metadata =====
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: K8S_POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: K8S_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+
+            # ===== OpenTelemetry Configuration =====
+            - name: OTEL_SERVICE_NAME
+              value: "subatomics-spring-app"
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: "true"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://my-release-k8s-infra-otel-agent:4318"
+
+
+            # ===== Spring Boot OTEL =====
+            - name: MANAGEMENT_OPENTELEMETRY_METRICS_EXPORT_PROMETHEUS_ENABLED
+              value: "true"
+            - name: MANAGEMENT_OPENTELEMETRY_TRACING_ENABLED
+              value: "true"
+
+          # ===== Resource Configuration =====
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 30
+
+#          readinessProbe:
+#            httpGet:
+#              path: /actuator/health/readiness
+#              port: 8080
+#            initialDelaySeconds: 45
+#            periodSeconds: 20

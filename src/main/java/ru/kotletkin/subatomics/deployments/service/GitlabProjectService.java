@@ -43,7 +43,7 @@ public class GitlabProjectService {
             commitActions.add(entryDirAction);
         }
 
-        gitLabApi.getCommitsApi().createCommit(2L, "main", "Create by " + author + ". Project: "
+        gitLabApi.getCommitsApi().createCommit(4L, "main", "Create by " + author + ". Project: "
                 + deployName, null, "Deployer Service", author, commitActions);
 
     }
@@ -51,7 +51,7 @@ public class GitlabProjectService {
     public List<DeploymentPlaneInfo> findAllDeployments() {
         try {
 
-            List<TreeItem> treeItems = gitLabApi.getRepositoryApi().getTree(2L, null, "main", true);
+            List<TreeItem> treeItems = gitLabApi.getRepositoryApi().getTree(4L, null, "main", true);
 
             List<String> modules = treeItems.stream()
                     .filter(item -> item.getType().equals(TreeItem.Type.TREE))

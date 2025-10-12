@@ -4,7 +4,7 @@
   "requesterName": "V. Kotletkin",
   "modules": [
     {
-      "id": 2,
+      "id": 1,
       "name": "checker",
       "environments": {
         "POSTGRES_HOST": "jdbc://test",
@@ -13,7 +13,7 @@
       }
     },
     {
-      "id": 1,
+      "id": 2,
       "name": "zalupa",
       "environments": {
         "RABBITMQ_HOST": "amqp://test",
