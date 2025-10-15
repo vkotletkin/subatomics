@@ -13,7 +13,7 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/api/v1/admin/deployments")
+@RequestMapping("/api/v1/deployments")
 @RequiredArgsConstructor
 @Tag(name = "Public Deployments API", description = "Public operations for deploy planes with services")
 public class PublicDeploymentController {

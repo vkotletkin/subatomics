@@ -33,17 +33,13 @@ management:
   endpoint:
     health:
       probes:
-        enabled: true  # Ключевая настройка!
+        enabled: true
       show-details: always
       show-components: always
   endpoints:
     web:
       exposure:
         include: health,info
-
-#logging:
-#  pattern:
-#    console: '{"time": "%date", "level": "%level", "service": "my-app", "trace": "%X{traceId:-}", "span": "%X{spanId:-}", "msg": "%message", "logger": "%logger"}%n'
 
 app:
   gitlab:

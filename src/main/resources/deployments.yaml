@@ -1,6 +1,4 @@
 deployments:
-  gitlab:
-    project-id: ${GITLAB_PROJECT_ID:2L}
   parameters:
     defaults:
       limits:
