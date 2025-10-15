@@ -9,6 +9,7 @@ import org.gitlab4j.api.models.TreeItem;
 import org.gitlab4j.models.Constants;
 import org.springframework.stereotype.Service;
 import ru.kotletkin.subatomics.common.config.AppConfig;
+import ru.kotletkin.subatomics.common.dto.BaseResponse;
 import ru.kotletkin.subatomics.common.dto.CatalogDTO;
 import ru.kotletkin.subatomics.common.exception.GitlabServiceException;
 import ru.kotletkin.subatomics.deployments.dto.DeploymentPlaneInfo;
