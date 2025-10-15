@@ -8,4 +8,8 @@ import java.util.List;
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
 
     List<Registration> findByIdIn(List<Long> ids);
+
+    List<Registration> findByImage(String image);
+
+    List<Registration> findByNameAndVersion(String name, String version);
 }

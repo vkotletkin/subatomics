@@ -12,13 +12,10 @@ import java.util.List;
 public class DeployRequest {
 
     @NotBlank
-    String deployName;
+    String deploymentPlaneName;
 
     @NotBlank
     String namespace;
-
-    @NotBlank
-    String requesterName;
 
     List<DeployModuleDTO> modules;
 }

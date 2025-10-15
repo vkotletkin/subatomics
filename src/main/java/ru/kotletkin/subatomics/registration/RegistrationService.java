@@ -1,7 +1,6 @@
 package ru.kotletkin.subatomics.registration;
 
 
-import ru.kotletkin.subatomics.common.dto.BaseResponse;
 import ru.kotletkin.subatomics.registration.dto.RegistrationDTO;
 import ru.kotletkin.subatomics.registration.dto.RegistrationPage;
 import ru.kotletkin.subatomics.registration.dto.RegistrationRequest;
@@ -13,5 +12,7 @@ public interface RegistrationService {
 
     RegistrationDTO findById(long id);
 
-    BaseResponse registerMicroservice(RegistrationRequest registrationDTO);
+    RegistrationDTO registerMicroservice(RegistrationRequest registrationDTO);
+
+    void deleteById(long id);
 }

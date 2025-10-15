@@ -7,8 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kotletkin.subatomics.common.dto.BaseResponse;
 import ru.kotletkin.subatomics.common.dto.PaginationMetadata;
+import ru.kotletkin.subatomics.common.exception.ModuleExistException;
 import ru.kotletkin.subatomics.registration.RegistrationMapper;
 import ru.kotletkin.subatomics.registration.RegistrationRepository;
 import ru.kotletkin.subatomics.registration.RegistrationService;
@@ -26,6 +26,8 @@ import static ru.kotletkin.subatomics.common.exception.NotFoundException.notFoun
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RegistartionServiceImpl implements RegistrationService {
+
+    private static final String NOT_FOUND_MESSAGE = "Регистрация модуля с идентификатором: {0} - не найдена";
 
     private final RegistrationMapper registrationMapper;
     private final RegistrationRepository registrationRepository;
@@ -51,18 +53,34 @@ public class RegistartionServiceImpl implements RegistrationService {
 
     @Override
     public RegistrationDTO findById(long id) {
-        Registration registration = registrationRepository.findById(id).orElseThrow(
-                notFoundException("Пользователь с идентификатором: {0} - не найден", id));
+
+        Registration registration = registrationRepository.findById(id).orElseThrow(notFoundException(NOT_FOUND_MESSAGE, id));
 
         return registrationMapper.toDTO(registration);
     }
 
     @Override
     @Transactional
-    public BaseResponse registerMicroservice(RegistrationRequest registrationDTO) {
-        // todo: add check on name, version
+    public RegistrationDTO registerMicroservice(RegistrationRequest registrationDTO) {
+
+        if (!registrationRepository.findByImage(registrationDTO.image()).isEmpty() ||
+                !registrationRepository.findByNameAndVersion(registrationDTO.name(), registrationDTO.version()).isEmpty()) {
+            throw new ModuleExistException("Модуль с таким именем и версией, либо названием образа уже существует");
+        }
+
         Registration registration = registrationMapper.toModel(registrationDTO);
         registrationRepository.save(registration);
-        return new BaseResponse("Заявка на регистрацию успешно отправлена", "Описание отсутствует");
+        return registrationMapper.toDTO(registration);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(long id) {
+        checkExistsById(id);
+        registrationRepository.deleteById(id);
+    }
+
+    private void checkExistsById(long id) {
+        registrationRepository.findById(id).orElseThrow(notFoundException(NOT_FOUND_MESSAGE, id));
     }
 }

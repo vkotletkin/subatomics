@@ -22,13 +22,26 @@ spec:
       containers:
         - name: subatomics-app
           image: nkhzrd/subatomics:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
               name: http
+
           env:
             - name: DB_HOST
               value: "192.168.207.128"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USERNAME
+              value: "postgres"
+            - name: DB_PASSWORD
+              value: "postgres"
+            - name: DB_NAME
+              value: "postgres"
+
             # ===== Kubernetes Metadata =====
+            # https://opentelemetry.io/docs/specs/semconv/resource/k8s/
+            # Downward API
             - name: HOST_IP
               valueFrom:
                 fieldRef:
@@ -56,6 +69,9 @@ spec:
                   fieldPath: spec.nodeName
 
             # ===== OpenTelemetry Configuration =====
+            # https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/
+            - name: OTEL_SDK_DISABLED
+              value: "false"
             - name: OTEL_SERVICE_NAME
               value: "subatomics-spring-app"
             - name: OTEL_EXPORTER_OTLP_INSECURE
@@ -64,7 +80,7 @@ spec:
               value: "http://my-release-k8s-infra-otel-agent:4318"
 
 
-            # ===== Spring Boot OTEL =====
+            # ===== Spring Boot OTEL Settings =====
             - name: MANAGEMENT_OPENTELEMETRY_METRICS_EXPORT_PROMETHEUS_ENABLED
               value: "true"
             - name: MANAGEMENT_OPENTELEMETRY_TRACING_ENABLED
@@ -73,22 +89,22 @@ spec:
           # ===== Resource Configuration =====
           resources:
             requests:
-              memory: "512Mi"
-              cpu: "250m"
-            limits:
-              memory: "1Gi"
+              memory: "1024Mi"
               cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
 
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/liveness
               port: 8080
             initialDelaySeconds: 90
             periodSeconds: 30
 
-#          readinessProbe:
-#            httpGet:
-#              path: /actuator/health/readiness
-#              port: 8080
-#            initialDelaySeconds: 45
-#            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 45
+            periodSeconds: 20

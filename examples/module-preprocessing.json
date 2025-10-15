@@ -1,7 +1,7 @@
 {
   "name": "module-preprocessing",
   "version": "1.0",
-  "image": "gcr.io/google-samples/gb-frontend:v5",
+  "image": "gcr.io/google-samples/gb-frontend:v6",
   "author": "Vladislav Kotletkin",
   "gitlabLink": "http://gitlab.io/module.git",
   "environmentVariables": {

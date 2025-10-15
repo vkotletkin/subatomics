@@ -21,7 +21,7 @@ public class DeploymentPlaneRequestValidator {
     public void validate(DeployRequest request) {
 
         if (request.getModules() == null || request.getModules().isEmpty()) {
-            throw new IllegalArgumentException("Список модулей не может быть пустым");
+            throw new IncorrectModulesException("Список модулей не может быть пустым");
         }
 
         this.checkParameters(request);
@@ -39,12 +39,12 @@ public class DeploymentPlaneRequestValidator {
         Registration registration = registrations.get(moduleId);
 
         if (registration == null) {
-            throw new IncorrectModulesException("Module {0} not found", moduleId);
+            throw new IncorrectModulesException("Модуль с идентификатором {0} не найден", moduleId);
         }
 
         if (!registration.getEnvironmentVariables().equals(module.getEnvironments())) {
             throw new IncorrectModulesException(
-                    "Environment variables do not match for module {0}", moduleId);
+                    "Переменные окружения не совпадают с зарегистрированными для модуля с идентификатором: {0}", moduleId);
         }
     }
 

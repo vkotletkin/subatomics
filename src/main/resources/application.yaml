@@ -26,35 +26,28 @@ spring:
   sql:
     init:
       mode: never
-
-springdoc:
-  show-actuator: true
+  main:
+    banner-mode: off
 
 management:
+  endpoint:
+    health:
+      probes:
+        enabled: true  # Ключевая настройка!
+      show-details: always
+      show-components: always
   endpoints:
     web:
-      base-path: "/infra"
       exposure:
-        include: health, info, metrics, prometheus
-        exclude: env
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+        include: health,info
 
-gitlab:
-  url: http://gitlab.local:80
-  token: glpat-7DRy8QmdXzPjxVcPAm_-
+#logging:
+#  pattern:
+#    console: '{"time": "%date", "level": "%level", "service": "my-app", "trace": "%X{traceId:-}", "span": "%X{spanId:-}", "msg": "%message", "logger": "%logger"}%n'
 
-otel:
-  exporter:
-    otlp:
-      endpoint: http://192.168.207.128:4318
-
-  resource:
-    attributes:
-      k8s.cluster.name: "main-cluster"
-      deployment.environment: "development"
-      k8s.pod.ip: "127.0.0.1"
-      k8s.namespace.name: "local"
-      k8s.node.name: "localhost"
+app:
+  gitlab:
+    url: http://192.168.207.128:80
+    token: glpat-7DRy8QmdXzPjxVcPAm_-
+    project-id: 4
+    branch: main

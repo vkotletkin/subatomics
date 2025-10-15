@@ -1,10 +1,10 @@
 {
-  "deployName": "my-test-deploy",
+  "deploymentPlaneName": "my-test-deploy",
   "namespace": "processing-data",
   "requesterName": "V. Kotletkin",
   "modules": [
     {
-      "id": 1,
+      "id": 3,
       "name": "checker",
       "environments": {
         "POSTGRES_HOST": "jdbc://test",
@@ -13,7 +13,7 @@
       }
     },
     {
-      "id": 2,
+      "id": 1,
       "name": "zalupa",
       "environments": {
         "RABBITMQ_HOST": "amqp://test",

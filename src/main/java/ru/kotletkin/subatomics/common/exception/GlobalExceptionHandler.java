@@ -23,6 +23,20 @@ public class GlobalExceptionHandler {
         return new ErrorResponse("Элемент не найден", e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler
+    public ErrorResponse handleModuleExistException(ModuleExistException e) {
+        log.error("Ошибка существования модуля. {}", e.getMessage());
+        return new ErrorResponse("Ошибка существования модуля", e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler
+    public ValidationErrorResponse handleIncorrectModulesException(IncorrectModulesException e) {
+        log.error("Ошибка при заполнении полей связанных с модулями. {}", e.getMessage());
+        return new ValidationErrorResponse(List.of(new ErrorResponse("Ошибка при заполнении полей связанных с модулями", e.getMessage())));
+    }
+
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler
     public ValidationErrorResponse handleOnConstraintValidationException(ConstraintViolationException e) {

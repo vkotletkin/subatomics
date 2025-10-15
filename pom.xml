@@ -12,7 +12,7 @@
 
     <groupId>ru.kotletkin</groupId>
     <artifactId>subatomics</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>subatomics</name>
     <description>subatomics</description>
 
@@ -114,10 +114,10 @@
             <artifactId>spring-cloud-starter-kubernetes-fabric8-all</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>io.opentelemetry.instrumentation</groupId>
-            <artifactId>opentelemetry-spring-boot-starter</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.opentelemetry.instrumentation</groupId>-->
+<!--            <artifactId>opentelemetry-spring-boot-starter</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.gitlab4j</groupId>

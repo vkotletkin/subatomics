@@ -2,7 +2,6 @@ package ru.kotletkin.subatomics.deployments.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.gitlab4j.api.GitLabApiException;
 import org.springframework.stereotype.Service;
 import ru.kotletkin.subatomics.deployments.dto.DeployModuleDTO;
 import ru.kotletkin.subatomics.deployments.dto.DeployRequest;
@@ -25,7 +24,7 @@ public class DeploymentService {
     private final GitlabProjectService gitlabProjectService;
     private final RegistrationRepository registrationRepository;
 
-    public void handleRequest(DeployRequest deployRequest) {
+    public void deployPlane(DeployRequest deployRequest, String actionUsername) {
 
         // check query validate
         deploymentPlaneRequestValidator.validate(deployRequest);
@@ -42,16 +41,14 @@ public class DeploymentService {
         // create manifests for k8s
         Map<String, String> deployments = deploymentPlaneManifestGenerator.generatePlane(modulesInRequest, deployRequest, registrations);
 
-
-        try {
-            gitlabProjectService.createDeploy(deployRequest.getDeployName(), deployRequest.getRequesterName(), deployments);
-        } catch (GitLabApiException e) {
-            throw new RuntimeException(e);
-        }
-
+        gitlabProjectService.createDeploy(deployRequest.getDeploymentPlaneName(), actionUsername, deployments);
     }
 
     public List<DeploymentPlaneInfo> findAllDeployments() {
         return gitlabProjectService.findAllDeployments();
+    }
+
+    public void deletePlane(String name, String actionUsername) {
+        gitlabProjectService.deleteDeployment(actionUsername, name);
     }
 }

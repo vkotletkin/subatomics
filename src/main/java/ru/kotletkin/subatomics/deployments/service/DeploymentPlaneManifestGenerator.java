@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.client.utils.Serialization;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.kotletkin.subatomics.common.config.DeploymentsConfig;
+import ru.kotletkin.subatomics.common.exception.ModuleExistException;
 import ru.kotletkin.subatomics.deployments.dto.DeployModuleDTO;
 import ru.kotletkin.subatomics.deployments.dto.DeployRequest;
 import ru.kotletkin.subatomics.registration.model.Registration;
@@ -41,11 +42,10 @@ public class DeploymentPlaneManifestGenerator {
     }
 
     private String createDeploymentName(DeployModuleDTO module) {
-        long label = System.currentTimeMillis();
         return String.format(NAME_PATTERN,
                 module.getId(),
                 module.getName(),
-                label);
+                System.currentTimeMillis());
     }
 
     private Deployment buildDeployment(DeployModuleDTO module, String namespace,
@@ -93,10 +93,13 @@ public class DeploymentPlaneManifestGenerator {
     }
 
     private String getModuleImage(DeployModuleDTO module, Map<Long, Registration> registrations) {
+
         Registration registration = registrations.get(module.getId());
+
         if (registration == null) {
-            throw new IllegalArgumentException("No registration found for module ID: " + module.getId());
+            throw new ModuleExistException("Модуль с идентификатором не зарегистрирован: {0}", module.getId());
         }
+
         return registration.getImage();
     }
 

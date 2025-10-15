@@ -1,6 +1,6 @@
-package ru.kotletkin.subatomics.deployments;
+package ru.kotletkin.subatomics.deployments.controller;
 
-import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -13,9 +13,10 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/api/v1/deployments")
+@RequestMapping("/api/v1/admin/deployments")
 @RequiredArgsConstructor
-public class DeploymentController {
+@Tag(name = "Public Deployments API", description = "Public operations for deploy planes with services")
+public class PublicDeploymentController {
 
     private final DeploymentService deployService;
 
@@ -25,7 +26,7 @@ public class DeploymentController {
     }
 
     @PostMapping
-    public void deploySchema(@Valid @RequestBody DeployRequest deployRequest) {
-        deployService.handleRequest(deployRequest);
+    public void deployPlane(@Valid @RequestBody DeployRequest deployRequest, @RequestHeader(name = "X-Action-Username") String actionUsername) {
+        deployService.deployPlane(deployRequest, actionUsername);
     }
 }
