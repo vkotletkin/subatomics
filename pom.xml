@@ -11,10 +11,10 @@
     </parent>
 
     <groupId>ru.kotletkin</groupId>
-    <artifactId>subatomics</artifactId>
+    <artifactId>aard</artifactId>
     <version>0.0.2-SNAPSHOT</version>
-    <name>subatomics</name>
-    <description>subatomics</description>
+    <name>Aard Platform</name>
+    <description>Aard CaaS Platform</description>
 
     <properties>
         <java.version>21</java.version>

@@ -10,15 +10,17 @@
   "backend": {
     "namespace": "testing-plane-ns",
     "modules": {
-      "checker": {
+      "affffc99-9c0b-4ef8-bb6d-6ce9bd380a11": {
         "moduleRegistrationId": 1,
+        "name": "checker",
         "environments": {
           "POSTGRES_HOST": "jdbc://test",
           "POSTGRES_USER": "postgres",
           "POSTGRES_PSWD": "postgres"
         }
       },
-      "zaluper": {
+      "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11": {
+        "name": "zaluper",
         "moduleRegistrationId": 2,
         "environments": {
           "RABBITMQ_HOST": "amqp://test",
@@ -26,6 +28,8 @@
           "RABBITMQ_PSWD": "rabbitmq"
         }
       }
+    },
+    "connections": {
     }
   }
 }
