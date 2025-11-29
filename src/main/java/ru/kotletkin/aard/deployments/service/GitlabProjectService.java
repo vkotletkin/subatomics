@@ -18,6 +18,7 @@ import ru.kotletkin.aard.deployments.dto.DeploymentPlaneEnrichedDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,6 +27,8 @@ public class GitlabProjectService {
 
     private static final String SCHEMA_DIRECTORY_PATH = "core/schemas";
     private static final String APP_DIRECTORY_PATH = "apps/";
+    private static final String PATH_DELIMITER = "/";
+    private static final String GITKEEP_FILENAME = ".gitkeep";
 
     private final GitLabApi gitLabApi;
     private final AppConfig appConfig;
@@ -39,13 +42,13 @@ public class GitlabProjectService {
 
             CommitAction dirAction = new CommitAction();
             dirAction.setAction(CommitAction.Action.CREATE);
-            dirAction.setFilePath(APP_DIRECTORY_PATH + deployName + "/.gitkeep");
+            dirAction.setFilePath(APP_DIRECTORY_PATH + deployName + PATH_DELIMITER + GITKEEP_FILENAME);
             dirAction.setContent("");
             dirAction.setEncoding(Constants.Encoding.TEXT);
 
             CommitAction schemaAction = new CommitAction();
             schemaAction.setAction(CommitAction.Action.CREATE);
-            schemaAction.setFilePath(SCHEMA_DIRECTORY_PATH + "/" + deployName + ".json");
+            schemaAction.setFilePath(SCHEMA_DIRECTORY_PATH + PATH_DELIMITER + deployName + ".json");
             schemaAction.setContent(coreSchemaBody);
             schemaAction.setEncoding(Constants.Encoding.TEXT);
 
@@ -55,7 +58,7 @@ public class GitlabProjectService {
             for (Map.Entry<String, String> entry : deployments.entrySet()) {
                 CommitAction entryDirAction = new CommitAction();
                 entryDirAction.setAction(CommitAction.Action.CREATE);
-                entryDirAction.setFilePath(APP_DIRECTORY_PATH + deployName + "/" + entry.getKey() + ".yaml");
+                entryDirAction.setFilePath(APP_DIRECTORY_PATH + deployName + PATH_DELIMITER + entry.getKey() + ".yaml");
                 entryDirAction.setContent(entry.getValue());  // Пустой файл для создания директории
                 entryDirAction.setEncoding(Constants.Encoding.TEXT);
                 commitActions.add(entryDirAction);
@@ -77,7 +80,7 @@ public class GitlabProjectService {
 
             return treeItems.stream()
                     .filter(i -> i.getType().equals(TreeItem.Type.BLOB))
-                    .filter(i -> i.getPath().contains(SCHEMA_DIRECTORY_PATH) && !i.getPath().contains(".gitkeep"))
+                    .filter(i -> i.getPath().contains(SCHEMA_DIRECTORY_PATH) && !i.getPath().contains(GITKEEP_FILENAME))
                     .map(i -> getFileOnPath(i.getPath()))
                     .map(RepositoryFile::getDecodedContentAsString)
                     .map(this::castFromStringToEnriched)
@@ -98,8 +101,18 @@ public class GitlabProjectService {
             List<String> fileNames = treeItems.stream()
                     .filter(item -> item.getType().equals(TreeItem.Type.BLOB))
                     .map(TreeItem::getPath)
-                    .filter(path -> path.startsWith(APP_DIRECTORY_PATH + deploymentName + "/"))
+                    .filter(path -> path.startsWith(APP_DIRECTORY_PATH + deploymentName + PATH_DELIMITER))
+                    .collect(Collectors.toList());
+
+            List<String> coreItems = treeItems.stream()
+                    .filter(item -> item.getType().equals(TreeItem.Type.BLOB))
+                    .filter(item -> item.getPath().contains(SCHEMA_DIRECTORY_PATH) && !item.getPath().contains(GITKEEP_FILENAME))
+                    .filter(item -> item.getName().contains(deploymentName))
+                    .map(TreeItem::getPath)
                     .toList();
+
+            fileNames.addAll(coreItems);
+
 
             List<CommitAction> commitActions = fileNames.stream()
                     .map(i -> new CommitAction().withAction(CommitAction.Action.DELETE).withFilePath(i))

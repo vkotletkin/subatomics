@@ -41,4 +41,10 @@ public class PublicRegistrationController {
         log.info("Регистрация модуля из репозитория {} пользователем с именем: {}", registrationDTO.gitlabLink(), actionUsername);
         return registrationService.registerMicroservice(registrationDTO);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteRegistration(@PathVariable long id, @RequestHeader(name = "X-Action-Username") String actionUsername) {
+        log.info("Удаление регистрации с идентификатором: {} администратором: {}", id, actionUsername);
+        registrationService.deleteById(id);
+    }
 }
