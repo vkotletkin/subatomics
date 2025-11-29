@@ -1,11 +1,12 @@
 package ru.kotletkin.subatomics.deployments.service;
 
+import io.fabric8.kubernetes.client.utils.Serialization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.kotletkin.subatomics.deployments.dto.DeployModuleDTO;
-import ru.kotletkin.subatomics.deployments.dto.DeployRequest;
-import ru.kotletkin.subatomics.deployments.dto.DeploymentPlaneInfo;
+import ru.kotletkin.subatomics.deployments.dto.DeploymentPlaneEnrichedDTO;
+import ru.kotletkin.subatomics.deployments.dto.backend.DeployModuleDTO;
+import ru.kotletkin.subatomics.deployments.dto.backend.DeployRequest;
 import ru.kotletkin.subatomics.registration.RegistrationRepository;
 import ru.kotletkin.subatomics.registration.model.Registration;
 
@@ -24,27 +25,32 @@ public class DeploymentService {
     private final GitlabProjectService gitlabProjectService;
     private final RegistrationRepository registrationRepository;
 
-    public void deployPlane(DeployRequest deployRequest, String actionUsername) {
+    public void deployPlane(DeploymentPlaneEnrichedDTO deploymentPlaneEnrichedDTO, String actionUsername) {
 
+        String deployPlaneName = deploymentPlaneEnrichedDTO.getPlaneName();
+
+        DeployRequest deployRequest = deploymentPlaneEnrichedDTO.getBackend();
         // check query validate
         deploymentPlaneRequestValidator.validate(deployRequest);
 
-        List<DeployModuleDTO> modulesInRequest = deployRequest.getModules();
+        Map<String, DeployModuleDTO> modulesInRequest = deployRequest.getModules();
 
-        List<Long> modulesNames = modulesInRequest.stream().map(DeployModuleDTO::getId).distinct().toList();
-        Map<Long, Registration> registrations = registrationRepository.findByIdIn(modulesNames).stream()
+        List<Long> moduleIds = modulesInRequest.values().stream().map(DeployModuleDTO::getModuleRegistrationId).distinct().toList();
+        Map<Long, Registration> registrations = registrationRepository.findByIdIn(moduleIds).stream()
                 .collect(Collectors.toMap(Registration::getId, Function.identity()));
 
         // check all modules are really exists in registrations and environments equals
-        deploymentPlaneRequestValidator.validateModulesConsistency(modulesInRequest, registrations);
+        deploymentPlaneRequestValidator.validateModulesConsistency(modulesInRequest.values(), registrations);
 
         // create manifests for k8s
         Map<String, String> deployments = deploymentPlaneManifestGenerator.generatePlane(modulesInRequest, deployRequest, registrations);
 
-        gitlabProjectService.createDeploy(deployRequest.getDeploymentPlaneName(), actionUsername, deployments);
+        String coreSchemaBody = Serialization.asJson(deploymentPlaneEnrichedDTO);
+
+        gitlabProjectService.createDeploy(coreSchemaBody, deployPlaneName, actionUsername, deployments);
     }
 
-    public List<DeploymentPlaneInfo> findAllDeployments() {
+    public List<DeploymentPlaneEnrichedDTO> findAllPlanes() {
         return gitlabProjectService.findAllDeployments();
     }
 

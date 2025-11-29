@@ -1,4 +1,4 @@
-services:
+﻿services:
 
   postgres:
     image: postgres:17.6

@@ -1,4 +1,4 @@
-package ru.kotletkin.subatomics.deployments.dto;
+package ru.kotletkin.subatomics.deployments.dto.backend;
 
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.kotletkin.subatomics.common.config.DeploymentsConfig;
 import ru.kotletkin.subatomics.common.exception.ModuleExistException;
-import ru.kotletkin.subatomics.deployments.dto.DeployModuleDTO;
-import ru.kotletkin.subatomics.deployments.dto.DeployRequest;
+import ru.kotletkin.subatomics.deployments.dto.backend.DeployModuleDTO;
+import ru.kotletkin.subatomics.deployments.dto.backend.DeployRequest;
 import ru.kotletkin.subatomics.registration.model.Registration;
 
 import java.util.HashMap;
@@ -20,19 +20,27 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DeploymentPlaneManifestGenerator {
 
-    private static final String NAME_PATTERN = "deployment-%d-%s-%d"; // DEPLOYMENT-IDENTIFICATOR-NAME-TIME
+    private static final String DEPLOYMENT_NAME_PATTERN = "deployment-%d-%s-%d"; // DEPLOYMENT-IDENTIFICATOR-NAME-TIME
+    private static final String NAMESPACE_NAME_PATTERN = "namespace-%s";
+
+    private static final String IMAGE_PULLPOLICY_SETTING_VALUE = "Always";
 
     private final DeploymentsConfig deploymentsConfig;
 
-    public Map<String, String> generatePlane(List<DeployModuleDTO> modulesInRequest, DeployRequest deployRequest,
+    public Map<String, String> generatePlane(Map<String, DeployModuleDTO> modulesInRequest, DeployRequest deployRequest,
                                              Map<Long, Registration> registrations) {
 
         Map<String, String> modulesManifestsMap = new HashMap<>();
-        String namespace = deployRequest.getNamespace();
+        String namespaceName = deployRequest.getNamespace();
 
-        for (DeployModuleDTO module : modulesInRequest) {
-            String deploymentName = createDeploymentName(module);
-            Deployment deployment = buildDeployment(module, namespace, deploymentName, registrations);
+        Namespace namespace = buildNamespace(namespaceName);
+        modulesManifestsMap.put(createNamespaceName(namespaceName), Serialization.asYaml(namespace));
+
+        for (Map.Entry<String, DeployModuleDTO> moduleEntry : modulesInRequest.entrySet()) {
+            String moduleName = moduleEntry.getKey();
+            DeployModuleDTO module = moduleEntry.getValue();
+            String deploymentName = createDeploymentName(moduleName, module);
+            Deployment deployment = buildDeployment(module, namespaceName, deploymentName, registrations);
             String deploymentYaml = Serialization.asYaml(deployment);
 
             modulesManifestsMap.put(deploymentName, deploymentYaml);
@@ -41,11 +49,19 @@ public class DeploymentPlaneManifestGenerator {
         return modulesManifestsMap;
     }
 
-    private String createDeploymentName(DeployModuleDTO module) {
-        return String.format(NAME_PATTERN,
-                module.getId(),
-                module.getName(),
+    private String createDeploymentName(String name, DeployModuleDTO module) {
+        return String.format(DEPLOYMENT_NAME_PATTERN,
+                module.getModuleRegistrationId(),
+                name,
                 System.currentTimeMillis());
+    }
+
+    private String createNamespaceName(String namespaceName) {
+        return String.format(NAMESPACE_NAME_PATTERN, namespaceName);
+    }
+
+    private Namespace buildNamespace(String namespace) {
+        return new NamespaceBuilder().withNewMetadata().withName(namespace).withLabels(Map.of("name", namespace)).endMetadata().build();
     }
 
     private Deployment buildDeployment(DeployModuleDTO module, String namespace,
@@ -70,6 +86,7 @@ public class DeploymentPlaneManifestGenerator {
                 .addNewContainer()
                 .withName("app")
                 .withImage(getModuleImage(module, registrations))
+                .withImagePullPolicy(IMAGE_PULLPOLICY_SETTING_VALUE)
                 .withEnv(createEnvVars(module))
                 .withResources(createResourceRequirements())
                 .endContainer()
@@ -94,10 +111,10 @@ public class DeploymentPlaneManifestGenerator {
 
     private String getModuleImage(DeployModuleDTO module, Map<Long, Registration> registrations) {
 
-        Registration registration = registrations.get(module.getId());
+        Registration registration = registrations.get(module.getModuleRegistrationId());
 
         if (registration == null) {
-            throw new ModuleExistException("Модуль с идентификатором не зарегистрирован: {0}", module.getId());
+            throw new ModuleExistException("Модуль с идентификатором не зарегистрирован: {0}", module.getModuleRegistrationId());
         }
 
         return registration.getImage();

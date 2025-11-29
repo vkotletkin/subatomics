@@ -1,4 +1,4 @@
-package ru.kotletkin.subatomics.deployments.dto;
+package ru.kotletkin.subatomics.deployments.dto.backend;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,10 +13,7 @@ import java.util.Map;
 public class DeployModuleDTO {
 
     @NotBlank
-    Long id;
-
-    @NotBlank
-    String name;
+    Long moduleRegistrationId;
 
     @NotNull
     Map<String, String> environments;

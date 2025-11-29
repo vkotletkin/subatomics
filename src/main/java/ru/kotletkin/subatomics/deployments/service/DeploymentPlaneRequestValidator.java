@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.kotletkin.subatomics.common.config.DeploymentsConfig;
 import ru.kotletkin.subatomics.common.exception.IncorrectModulesException;
-import ru.kotletkin.subatomics.deployments.dto.DeployModuleDTO;
-import ru.kotletkin.subatomics.deployments.dto.DeployParametersDTO;
-import ru.kotletkin.subatomics.deployments.dto.DeployRequest;
+import ru.kotletkin.subatomics.deployments.dto.backend.DeployModuleDTO;
+import ru.kotletkin.subatomics.deployments.dto.backend.DeployParametersDTO;
+import ru.kotletkin.subatomics.deployments.dto.backend.DeployRequest;
 import ru.kotletkin.subatomics.registration.model.Registration;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 @Service
@@ -27,7 +27,7 @@ public class DeploymentPlaneRequestValidator {
         this.checkParameters(request);
     }
 
-    public void validateModulesConsistency(List<DeployModuleDTO> requestedModules,
+    public void validateModulesConsistency(Collection<DeployModuleDTO> requestedModules,
                                            Map<Long, Registration> registrations) {
 
         requestedModules.forEach(module -> validateModuleConsistency(module, registrations));
@@ -35,7 +35,7 @@ public class DeploymentPlaneRequestValidator {
 
     public void validateModuleConsistency(DeployModuleDTO module, Map<Long, Registration> registrations) {
 
-        Long moduleId = module.getId();
+        Long moduleId = module.getModuleRegistrationId();
         Registration registration = registrations.get(moduleId);
 
         if (registration == null) {
@@ -49,7 +49,7 @@ public class DeploymentPlaneRequestValidator {
     }
 
     private void checkParameters(DeployRequest request) {
-        request.getModules().stream()
+        request.getModules().values().stream()
                 .filter(module -> module.getParameters() == null)
                 .forEach(module -> module.setParameters(createDefaultParameters()));
     }

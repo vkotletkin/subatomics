@@ -1,21 +1,18 @@
-package ru.kotletkin.subatomics.deployments.dto;
+package ru.kotletkin.subatomics.deployments.dto.backend;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
+import java.util.Map;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeployRequest {
 
     @NotBlank
-    String deploymentPlaneName;
-
-    @NotBlank
     String namespace;
 
-    List<DeployModuleDTO> modules;
+    Map<String, DeployModuleDTO> modules;
 }

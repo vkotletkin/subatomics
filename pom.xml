@@ -114,6 +114,7 @@
             <artifactId>spring-cloud-starter-kubernetes-fabric8-all</artifactId>
         </dependency>
 
+
 <!--        <dependency>-->
 <!--            <groupId>io.opentelemetry.instrumentation</groupId>-->
 <!--            <artifactId>opentelemetry-spring-boot-starter</artifactId>-->
