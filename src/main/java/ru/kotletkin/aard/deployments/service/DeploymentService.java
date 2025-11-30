@@ -4,6 +4,7 @@ import io.fabric8.kubernetes.client.utils.Serialization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.kotletkin.aard.common.exception.PlaneExistException;
 import ru.kotletkin.aard.deployments.dto.DeploymentPlaneEnrichedDTO;
 import ru.kotletkin.aard.deployments.dto.backend.DeployModuleDTO;
 import ru.kotletkin.aard.deployments.dto.backend.DeployRequest;
@@ -29,9 +30,14 @@ public class DeploymentService {
     public void deployPlane(DeploymentPlaneEnrichedDTO deploymentPlaneEnrichedDTO, String actionUsername) {
 
         String deployPlaneName = deploymentPlaneEnrichedDTO.getPlaneName();
-
         DeployRequest deployRequest = deploymentPlaneEnrichedDTO.getBackend();
-        // check query validate
+
+        List<String> existingPlanes = gitlabProjectService.findAllDeployments();
+
+        if (existingPlanes.contains(deployPlaneName)) {
+            throw new PlaneExistException("Plane name with name: {0} - exists", deployPlaneName);
+        }
+
         deploymentPlaneRequestValidator.validate(deployRequest);
 
         Map<UUID, DeployModuleDTO> modulesInRequest = deployRequest.getModules();
@@ -51,7 +57,11 @@ public class DeploymentService {
         gitlabProjectService.createDeploy(coreSchemaBody, deployPlaneName, actionUsername, deployments);
     }
 
-    public List<DeploymentPlaneEnrichedDTO> findAllPlanes() {
+    public DeploymentPlaneEnrichedDTO findPlaneByName(String name) {
+        return gitlabProjectService.findDeploymentBodyOnName(name);
+    }
+
+    public List<String> findAllPlanes() {
         return gitlabProjectService.findAllDeployments();
     }
 

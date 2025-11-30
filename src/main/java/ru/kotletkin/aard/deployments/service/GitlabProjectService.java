@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static ru.kotletkin.aard.common.exception.NotFoundException.notFoundException;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -72,7 +74,12 @@ public class GitlabProjectService {
         }
     }
 
-    public List<DeploymentPlaneEnrichedDTO> findAllDeployments() {
+    public DeploymentPlaneEnrichedDTO updatePlane() {
+        return null;
+    }
+
+    public DeploymentPlaneEnrichedDTO findDeploymentBodyOnName(String planeName) {
+
         try {
 
             List<TreeItem> treeItems = gitLabApi.getRepositoryApi().getTree(appConfig.getGitlab().getProjectId(), null,
@@ -81,9 +88,28 @@ public class GitlabProjectService {
             return treeItems.stream()
                     .filter(i -> i.getType().equals(TreeItem.Type.BLOB))
                     .filter(i -> i.getPath().contains(SCHEMA_DIRECTORY_PATH) && !i.getPath().contains(GITKEEP_FILENAME))
+                    .filter(i -> i.getPath().contains(planeName))
                     .map(i -> getFileOnPath(i.getPath()))
                     .map(RepositoryFile::getDecodedContentAsString)
                     .map(this::castFromStringToEnriched)
+                    .findFirst()
+                    .orElseThrow(notFoundException("Plane id with name: {0} - not found"));
+
+        } catch (GitLabApiException e) {
+            throw new GitlabServiceException("Ошибка при поиске всех запущенных планов развертывания");
+        }
+    }
+
+    public List<String> findAllDeployments() {
+        try {
+
+            List<TreeItem> treeItems = gitLabApi.getRepositoryApi().getTree(appConfig.getGitlab().getProjectId(), null,
+                    appConfig.getGitlab().getBranch(), true);
+
+            return treeItems.stream()
+                    .filter(i -> i.getType().equals(TreeItem.Type.BLOB))
+                    .filter(i -> i.getPath().contains(SCHEMA_DIRECTORY_PATH) && !i.getPath().contains(GITKEEP_FILENAME))
+                    .map(i -> i.getName().replace(".json", ""))
                     .toList();
 
         } catch (GitLabApiException e) {
@@ -142,5 +168,4 @@ public class GitlabProjectService {
             throw new GitlabServiceException("Проблема при десериализации схемы деплоя");
         }
     }
-
 }

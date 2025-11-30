@@ -10,6 +10,7 @@ import ru.kotletkin.aard.deployments.dto.backend.DeployRequest;
 import ru.kotletkin.aard.registration.model.Registration;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -39,7 +40,7 @@ public class DeploymentPlaneRequestValidator {
         Registration registration = registrations.get(moduleId);
 
         if (registration == null) {
-            throw new IncorrectModulesException("Модуль с идентификатором {0} не найден", moduleId);
+            throw new IncorrectModulesException("Module with id: {0} - not found", moduleId);
         }
 
         if (!registration.getEnvironmentVariables().equals(module.getEnvironments())) {

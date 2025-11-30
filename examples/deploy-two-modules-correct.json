@@ -1,8 +1,8 @@
 {
-  "planeName": "testing-plane",
+  "planeName": "testing-plane-2",
   "frontend": [
     {
-      "moduleName": "string",
+      "moduleId": "string",
       "x": "string",
       "y": "string"
     }

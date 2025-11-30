@@ -19,8 +19,8 @@ import ru.kotletkin.aard.registration.dto.RegistrationSort;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/registrations")
-@Tag(name = "Public Registrations API", description = "Public operations for registrations of services")
-public class PublicRegistrationController {
+@Tag(name = "Registrations API", description = "Public operations for registrations of services")
+public class RegistrationController {
 
     private final RegistrationService registrationService;
 
@@ -37,7 +37,7 @@ public class PublicRegistrationController {
     }
 
     @PostMapping
-    public RegistrationDTO createRegister(@Valid @RequestBody RegistrationRequest registrationDTO, @RequestHeader(name = "X-Action-Username") String actionUsername) {
+    public RegistrationDTO createRegistration(@Valid @RequestBody RegistrationRequest registrationDTO, @RequestHeader(name = "X-Action-Username") String actionUsername) {
         log.info("Регистрация модуля из репозитория {} пользователем с именем: {}", registrationDTO.gitlabLink(), actionUsername);
         return registrationService.registerMicroservice(registrationDTO);
     }

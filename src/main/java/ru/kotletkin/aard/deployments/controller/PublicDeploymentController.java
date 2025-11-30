@@ -22,8 +22,18 @@ public class PublicDeploymentController {
     private final DeploymentService deployService;
 
     @GetMapping
-    public List<DeploymentPlaneEnrichedDTO> getAll() {
+    public List<String> getAll() {
         return deployService.findAllPlanes();
+    }
+
+    @GetMapping("/{name}")
+    public DeploymentPlaneEnrichedDTO getPlaneByName(@PathVariable String name) {
+        return deployService.findPlaneByName(name);
+    }
+
+    @PutMapping("/{name}")
+    public DeploymentPlaneEnrichedDTO updatePlane(@PathVariable String name) {
+        return null;
     }
 
     @PostMapping
