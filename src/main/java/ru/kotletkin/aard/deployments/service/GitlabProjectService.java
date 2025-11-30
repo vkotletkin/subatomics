@@ -70,7 +70,7 @@ public class GitlabProjectService {
                     "Created by " + author + ". Project: " + deployName, null, "deployer@zov.ru", author, commitActions);
 
         } catch (GitLabApiException e) {
-            throw new GitlabServiceException("Ошибка при развертывании нового плана. {0}", e.getMessage());
+            throw new GitlabServiceException("An error occurred when deploying a new plan. {0}", e.getMessage());
         }
     }
 
@@ -96,7 +96,7 @@ public class GitlabProjectService {
                     .orElseThrow(notFoundException("Plane id with name: {0} - not found"));
 
         } catch (GitLabApiException e) {
-            throw new GitlabServiceException("Ошибка при поиске всех запущенных планов развертывания");
+            throw new GitlabServiceException("Error when searching for all running deployment plans");
         }
     }
 
@@ -113,7 +113,7 @@ public class GitlabProjectService {
                     .toList();
 
         } catch (GitLabApiException e) {
-            throw new GitlabServiceException("Ошибка при поиске всех запущенных планов развертывания");
+            throw new GitlabServiceException("Error when searching for all running deployment plans");
         }
     }
 
@@ -148,7 +148,7 @@ public class GitlabProjectService {
                     "Deleted by " + author + ". Project: " + deploymentName, null, "deployer@zov.ru", author, commitActions);
 
         } catch (GitLabApiException e) {
-            throw new GitlabServiceException("Ошибка при удалении плана развертывания");
+            throw new GitlabServiceException("Error deleting the deployment plan");
         }
 
     }
@@ -157,7 +157,7 @@ public class GitlabProjectService {
         try {
             return gitLabApi.getRepositoryFileApi().getFile(appConfig.getGitlab().getProjectId(), path, appConfig.getGitlab().getBranch());
         } catch (GitLabApiException e) {
-            throw new GitlabServiceException("Ошибка при получении исходной схемы из репозитория. Путь к схеме: {0}", path);
+            throw new GitlabServiceException("Error when getting the source schema from the repository. Path to the schema: {0}", path);
         }
     }
 
@@ -165,7 +165,7 @@ public class GitlabProjectService {
         try {
             return objectMapper.readValue(jsonBody, DeploymentPlaneEnrichedDTO.class);
         } catch (JsonProcessingException e) {
-            throw new GitlabServiceException("Проблема при десериализации схемы деплоя");
+            throw new GitlabServiceException("The problem with deserializing the deployment plane");
         }
     }
 }

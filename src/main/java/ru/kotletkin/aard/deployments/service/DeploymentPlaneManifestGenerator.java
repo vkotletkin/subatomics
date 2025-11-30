@@ -36,19 +36,26 @@ public class DeploymentPlaneManifestGenerator {
 
         Namespace namespace = buildNamespace(namespaceName);
         modulesManifestsMap.put(createNamespaceName(namespaceName), Serialization.asYaml(namespace));
+        modulesManifestsMap.putAll(generateModuleManifests(modulesInRequest, namespaceName, registrations));
 
-        for (Map.Entry<UUID, DeployModuleDTO> moduleEntry : modulesInRequest.entrySet()) {
+        return modulesManifestsMap;
+    }
+
+    public Map<String, String> generateModuleManifests(Map<UUID, DeployModuleDTO> modules, String namespaceName,
+                                                       Map<Long, Registration> registrations) {
+        Map<String, String> manifests = new HashMap<>();
+        for (Map.Entry<UUID, DeployModuleDTO> moduleEntry : modules.entrySet()) {
             String moduleName = moduleEntry.getKey().toString().replace("-", ""); // uuid to string
             DeployModuleDTO module = moduleEntry.getValue();
             String deploymentName = createDeploymentName(moduleName, module);
             Deployment deployment = buildDeployment(module, namespaceName, deploymentName, registrations);
             String deploymentYaml = Serialization.asYaml(deployment);
 
-            modulesManifestsMap.put(deploymentName, deploymentYaml);
+            manifests.put(deploymentName, deploymentYaml);
         }
-
-        return modulesManifestsMap;
+        return manifests;
     }
+
 
     private String createDeploymentName(String name, DeployModuleDTO module) {
         return String.format(DEPLOYMENT_NAME_PATTERN,
@@ -115,7 +122,7 @@ public class DeploymentPlaneManifestGenerator {
         Registration registration = registrations.get(module.getModuleRegistrationId());
 
         if (registration == null) {
-            throw new ModuleExistException("Модуль с идентификатором не зарегистрирован: {0}", module.getModuleRegistrationId());
+            throw new ModuleExistException("The module with the ID is not registered: {0}", module.getModuleRegistrationId());
         }
 
         return registration.getImage();

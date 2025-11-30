@@ -3,7 +3,7 @@ package ru.kotletkin.aard.common.exception;
 import java.text.MessageFormat;
 import java.util.function.Supplier;
 
-public class PlaneExistException extends RuntimeException{
+public class PlaneExistException extends RuntimeException {
 
     public PlaneExistException(String message) {
         super(message);

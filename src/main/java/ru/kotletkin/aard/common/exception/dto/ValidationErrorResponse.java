@@ -2,5 +2,5 @@ package ru.kotletkin.aard.common.exception.dto;
 
 import java.util.List;
 
-public record ValidationErrorResponse(List<ErrorResponse> validationErrors) {
+public record ValidationErrorResponse(List<ErrorResponse> errors) {
 }

@@ -19,22 +19,22 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler
     public ErrorResponse handleNotFoundException(NotFoundException e) {
-        log.error("Элемент не найден. {}", e.getMessage());
-        return new ErrorResponse("Элемент не найден", e.getMessage());
+        log.error("Element not found. Error message: {}", e.getMessage());
+        return new ErrorResponse("Element not found", e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler
     public ErrorResponse handleModuleExistException(ModuleExistException e) {
-        log.error("Ошибка существования модуля. {}", e.getMessage());
-        return new ErrorResponse("Ошибка существования модуля", e.getMessage());
+        log.error("Module existence error. Error message: {}", e.getMessage());
+        return new ErrorResponse("Module existence error", e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler
     public ValidationErrorResponse handleIncorrectModulesException(IncorrectModulesException e) {
-        log.error("Ошибка при заполнении полей связанных с модулями. {}", e.getMessage());
-        return new ValidationErrorResponse(List.of(new ErrorResponse("Ошибка при заполнении полей связанных с модулями", e.getMessage())));
+        log.error("Error when filling in fields related to modules. Error message: {}", e.getMessage());
+        return new ValidationErrorResponse(List.of(new ErrorResponse("Error when filling in fields related to modules", e.getMessage())));
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)

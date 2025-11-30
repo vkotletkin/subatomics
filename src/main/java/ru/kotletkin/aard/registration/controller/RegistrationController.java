@@ -33,18 +33,19 @@ public class RegistrationController {
 
     @GetMapping("/{id}")
     public RegistrationDTO getRegistration(@PathVariable long id) {
+        log.info("Information about registration with the ID has been requested: {}", id);
         return registrationService.findById(id);
     }
 
     @PostMapping
     public RegistrationDTO createRegistration(@Valid @RequestBody RegistrationRequest registrationDTO, @RequestHeader(name = "X-Action-Username") String actionUsername) {
-        log.info("Регистрация модуля из репозитория {} пользователем с именем: {}", registrationDTO.gitlabLink(), actionUsername);
+        log.info("Registering a module from the {} repository by a user: {}", registrationDTO.gitlabLink(), actionUsername);
         return registrationService.registerMicroservice(registrationDTO);
     }
 
     @DeleteMapping("/{id}")
     public void deleteRegistration(@PathVariable long id, @RequestHeader(name = "X-Action-Username") String actionUsername) {
-        log.info("Удаление регистрации с идентификатором: {} администратором: {}", id, actionUsername);
+        log.info("Deleting a registration with the ID: {} by a user: {}", id, actionUsername);
         registrationService.deleteById(id);
     }
 }

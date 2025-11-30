@@ -27,7 +27,7 @@ import static ru.kotletkin.aard.common.exception.NotFoundException.notFoundExcep
 @Transactional(readOnly = true)
 public class RegistartionServiceImpl implements RegistrationService {
 
-    private static final String NOT_FOUND_MESSAGE = "Регистрация модуля с идентификатором: {0} - не найдена";
+    private static final String REGISTRATION_MODULE_NOT_FOUND_MESSAGE = "Registration of the module with the ID: {0} - not found";
 
     private final RegistrationMapper registrationMapper;
     private final RegistrationRepository registrationRepository;
@@ -54,7 +54,8 @@ public class RegistartionServiceImpl implements RegistrationService {
     @Override
     public RegistrationDTO findById(long id) {
 
-        Registration registration = registrationRepository.findById(id).orElseThrow(notFoundException(NOT_FOUND_MESSAGE, id));
+        Registration registration = registrationRepository.findById(id)
+                .orElseThrow(notFoundException(REGISTRATION_MODULE_NOT_FOUND_MESSAGE, id));
 
         return registrationMapper.toDTO(registration);
     }
@@ -65,7 +66,7 @@ public class RegistartionServiceImpl implements RegistrationService {
 
         if (!registrationRepository.findByImage(registrationDTO.image()).isEmpty() ||
                 !registrationRepository.findByNameAndVersion(registrationDTO.name(), registrationDTO.version()).isEmpty()) {
-            throw new ModuleExistException("Модуль с таким именем и версией, либо названием образа уже существует");
+            throw new ModuleExistException("A module with the same name and version or image name already exists");
         }
 
         Registration registration = registrationMapper.toModel(registrationDTO);
@@ -81,6 +82,6 @@ public class RegistartionServiceImpl implements RegistrationService {
     }
 
     private void checkExistsById(long id) {
-        registrationRepository.findById(id).orElseThrow(notFoundException(NOT_FOUND_MESSAGE, id));
+        registrationRepository.findById(id).orElseThrow(notFoundException(REGISTRATION_MODULE_NOT_FOUND_MESSAGE, id));
     }
 }

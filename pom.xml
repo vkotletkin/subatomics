@@ -126,12 +126,6 @@
             <version>6.1.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.argoproj.workflow</groupId>
-            <artifactId>argo-client-java</artifactId>
-            <version>v3.6.13</version>
-        </dependency>
-
     </dependencies>
 
     <dependencyManagement>

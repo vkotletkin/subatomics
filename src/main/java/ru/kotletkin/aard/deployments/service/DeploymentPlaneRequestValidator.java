@@ -10,7 +10,6 @@ import ru.kotletkin.aard.deployments.dto.backend.DeployRequest;
 import ru.kotletkin.aard.registration.model.Registration;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -22,7 +21,7 @@ public class DeploymentPlaneRequestValidator {
     public void validate(DeployRequest request) {
 
         if (request.getModules() == null || request.getModules().isEmpty()) {
-            throw new IncorrectModulesException("Список модулей не может быть пустым");
+            throw new IncorrectModulesException("The list of modules cannot be empty");
         }
 
         this.checkParameters(request);
@@ -45,7 +44,7 @@ public class DeploymentPlaneRequestValidator {
 
         if (!registration.getEnvironmentVariables().equals(module.getEnvironments())) {
             throw new IncorrectModulesException(
-                    "Переменные окружения не совпадают с зарегистрированными для модуля с идентификатором: {0}", moduleId);
+                    "The environment variables do not match those registered for the module with the identifier: {0}", moduleId);
         }
     }
 

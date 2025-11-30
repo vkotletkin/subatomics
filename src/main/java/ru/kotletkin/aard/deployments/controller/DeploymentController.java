@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/v1/deployments")
 @RequiredArgsConstructor
 @Tag(name = "Public Deployments API", description = "Public operations for deploy planes with services")
-public class PublicDeploymentController {
+public class DeploymentController {
 
     private final DeploymentService deployService;
 
@@ -28,23 +28,25 @@ public class PublicDeploymentController {
 
     @GetMapping("/{name}")
     public DeploymentPlaneEnrichedDTO getPlaneByName(@PathVariable String name) {
+        log.info("Requested body of plane with name: {}", name);
         return deployService.findPlaneByName(name);
     }
 
-    @PutMapping("/{name}")
-    public DeploymentPlaneEnrichedDTO updatePlane(@PathVariable String name) {
-        return null;
+    @PutMapping
+    public DeploymentPlaneEnrichedDTO updatePlane(@Valid @RequestBody DeploymentPlaneEnrichedDTO deploymentPlaneEnrichedDTO) {
+        throw new UnsupportedOperationException("Operation not supported now :(");
     }
 
     @PostMapping
     public void deployPlane(@Valid @RequestBody DeploymentPlaneEnrichedDTO deploymentPlaneEnrichedDTO,
                             @RequestHeader(name = "X-Action-Username") String actionUsername) {
+        log.info("Deploy plane with name: {} by a user: {}", deploymentPlaneEnrichedDTO.getPlaneName(), actionUsername);
         deployService.deployPlane(deploymentPlaneEnrichedDTO, actionUsername);
     }
 
     @DeleteMapping("/{name}")
     public void deletePlane(@PathVariable String name, @RequestHeader(name = "X-Action-Username") String actionUsername) {
-        log.info("Удаление плана развертывания с именем: {} администратором: {}", name, actionUsername);
+        log.info("Deleting plane with name: {} by a user: {}", name, actionUsername);
         deployService.deletePlane(name, actionUsername);
     }
 }
