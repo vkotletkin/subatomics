@@ -44,6 +44,6 @@ management:
 app:
   gitlab:
     url: http://192.168.207.128:80
-    token: glpat-7DRy8QmdXzPjxVcPAm_-
+    token: glpat-7DRy8QmdXzPjxVcPAm_- # project token
     project-id: 4
     branch: main
