@@ -23,6 +23,7 @@ spec:
         revision: main
         directories:
           - path: "apps/**"          # Включаем все директории и файлы
+        requeueAfterSecond: 30
   template:
     metadata:
       name: '{{path.basename}}'
